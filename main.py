@@ -16,7 +16,7 @@ clock = pygame.time.Clock()
 from load import *
 
 def restart():
-    global box_group, ground_group, player_group, scroll_group, sand_group, water_group
+    global box_group, ground_group, player_group, scroll_group, sand_group, water_group, player
     box_group = pygame.sprite.Group()
     ground_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
@@ -28,18 +28,22 @@ def restart():
     player_group.add(player)
 
 def lvlGame():
-    global box_group, ground_group, step, player_group, sand_group, water_group
+    global box_group, ground_group, step, player_group, sand_group, water_group, player
     step = 0
     box_group.draw(window)
     ground_group.draw(window)
     water_group.draw(window)
     sand_group.draw(window)
     player_group.draw(window)
-    box_group.update(step)
-    ground_group.update(step)
-    water_group.update(step)
-    sand_group.update(step)
-    player_group.update(scroll_group)
+    box_group.update(step, player_group, player)
+    ground_group.update(step, player_group, player)
+    water_group.update(step, player_group, player)
+    sand_group.update(step, player_group, player)
+    player_group.update(player_images, scroll_group,  player_group, player)
+    if player.rect.y > 850:
+        player.kill()
+        restart()
+        drawMap('game_lvl/lvl1.csv')
 
 
 

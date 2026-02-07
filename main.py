@@ -16,30 +16,44 @@ clock = pygame.time.Clock()
 from load import *
 
 def restart():
-    global box_group, ground_group, player_group, scroll_group, sand_group, water_group, player
+    global box_group, ground_group, player_group, scroll_group,\
+        sand_group, water_group, player, enemy_group, coin_group, stopenemy_group, portal_group
     box_group = pygame.sprite.Group()
     ground_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
     sand_group = pygame.sprite.Group()
     water_group = pygame.sprite.Group()
     scroll_group = pygame.sprite.Group()
+    enemy_group = pygame.sprite.Group()
+    coin_group = pygame.sprite.Group()
+    stopenemy_group = pygame.sprite.Group()
+    portal_group = pygame.sprite.Group()
 
     player = Player(player_image,(480, 560))
     player_group.add(player)
 
 def lvlGame():
-    global box_group, ground_group, step, player_group, sand_group, water_group, player
+    global box_group, ground_group, step, player_group, sand_group,\
+        water_group, player, enemy_group, coin_group, stopenemy_group, portal_group, stopEnemy_group
     step = 0
     box_group.draw(window)
     ground_group.draw(window)
     water_group.draw(window)
     sand_group.draw(window)
     player_group.draw(window)
-    box_group.update(step, player_group, player)
-    ground_group.update(step, player_group, player)
-    water_group.update(step, player_group, player)
-    sand_group.update(step, player_group, player)
-    player_group.update(player_images, scroll_group,  player_group, player)
+    enemy_group.draw(window)
+    coin_group.draw(window)
+    stopenemy_group.draw(window)
+    portal_group.draw(window)
+    box_group.update(step, player_group, player, stopenemy_group)
+    ground_group.update(step, player_group, player, stopenemy_group)
+    water_group.update(step, player_group, player, stopenemy_group)
+    sand_group.update(step, player_group, player, stopenemy_group)
+    player_group.update(player_images, scroll_group,  player_group, player, stopenemy_group, FPS)
+    enemy_group.update(step, player_group, player, stopenemy_group)
+    coin_group.update(step, player_group, player, stopenemy_group)
+    stopenemy_group.update(step, player_group, player, stopenemy_group)
+    portal_group.update(step, player_group, player, stopenemy_group)
     if player.rect.y > 850:
         player.kill()
         restart()
@@ -50,6 +64,8 @@ def lvlGame():
     pygame.display.update()
 
 def drawMap(mapFile):
+    global box_group, ground_group, step, player_group, sand_group, \
+        water_group, player, enemy_group, coin_group, stopenemy_group, portal_group
     game_map = []
     with open(mapFile, 'r') as file:
         for i in range(10):
@@ -75,6 +91,35 @@ def drawMap(mapFile):
                 box = Box(box_image, pos)
                 box_group.add(box)
                 scroll_group.add(box)
+            elif game_map[i][j] == '4':
+                coin = Coin(coin_image, pos)
+                coin_group.add(coin)
+                scroll_group.add(coin)
+            elif game_map[i][j] == '5':
+                stopenemy = StopEnemy(stop_image, pos)
+                stopenemy_group.add(stopenemy)
+                scroll_group.add(stopenemy)
+            elif game_map[i][j] == '6':
+                enemy1 = Enemy(enemy1_image, pos)
+                enemy_group.add(enemy1)
+                scroll_group.add(enemy1)
+            elif game_map[i][j] == '7':
+                enemy2 = Enemy(enemy2_image, pos)
+                enemy_group.add(enemy2)
+                scroll_group.add(enemy2)
+            elif game_map[i][j] == '8':
+                enemy3 = Enemy(enemy3_image, pos)
+                enemy_group.add(enemy3)
+                scroll_group.add(enemy3)
+            elif game_map[i][j] == '9':
+                enemy4 = Enemy(enemy4_image, pos)
+                enemy_group.add(enemy4)
+                scroll_group.add(enemy4)
+            elif game_map[i][j] == '10':
+                portal1 = Portal(portal1_image, pos)
+                enemy_group.add(portal1)
+                scroll_group.add(portal1)
+
 
 restart()
 drawMap('game_lvl/lvl1.csv')

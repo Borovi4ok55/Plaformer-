@@ -1,4 +1,7 @@
 import pygame
+from script import load_image
+
+player_images = load_image('assets/images/player')
 
 player_image = pygame.image.load('assets/images/player.png').convert_alpha()
 
@@ -23,6 +26,9 @@ enemy3_image = pygame.image.load('assets/images/enemy/3/1.png').convert_alpha()
 
 portal1_image = pygame.image.load('assets/images/portal/portal1.png').convert_alpha()
 
+coin_image = pygame.image.load('assets/images/item/coin.png').convert_alpha()
+
+enemy4_image = pygame.image.load('assets/images/enemy/4/1.png').convert_alpha()
 
 
 

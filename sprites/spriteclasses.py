@@ -109,9 +109,14 @@ class Player(pygame.sprite.Sprite):
         self.speed = 5
         self.velocity_y = 0
         self.on_ground = True
+
         self.frame = 0
         self.timer_anime = 0
         self.anime = False
+
+        self.invulnerable = False
+        self.invuln_timer = 0
+        self.invuln_duration = 60
 
     def animation(self, player_images, FPS):
         if self.anime:
@@ -123,9 +128,7 @@ class Player(pygame.sprite.Sprite):
                     self.frame += 1
                 self.timer_anime = 0
 
-    def update(self, player_images, scroll_group,  player_group, player, stopEnemy_group, FPS):
-        self.animation(self, player_images, FPS)
-        key = pygame.key.get_pressed()
+    def move(self, player_images, scroll_group,  player_group, player, stopEnemy_group, FPS, key):
         if key[pygame.K_RIGHT]:
             self.anime = True
             # self.image = pygame.transform.flip(player_image, False, False)
@@ -144,6 +147,8 @@ class Player(pygame.sprite.Sprite):
                 scroll_group.update(self.speed,  player_group, player, stopEnemy_group)
         else:
             self.anime = False
+
+    def jump(self, key):
         if key[pygame.K_SPACE] and self.on_ground:
             self.velocity_y = -15
             self.on_ground = False
@@ -152,6 +157,19 @@ class Player(pygame.sprite.Sprite):
         if self.velocity_y > 10:
             self.velocity_y = 10
 
+    def update(self, player_images, scroll_group,  player_group, player, stopEnemy_group, FPS):
+        self.animation(player_images, FPS)
+        key = pygame.key.get_pressed()
+        self.move(player_images, scroll_group,  player_group, player, stopEnemy_group, FPS, key)
+        self.jump(key)
+        self.hit()
+
+    def hit(self):
+        if self.invulnerable:
+            self.invuln_timer += 1
+            if self.invuln_timer >= self.invuln_duration:
+                self.invulnerable = False
+                self.invuln_timer = 0
 
 
 
@@ -189,17 +207,39 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.y = pos[1]
         self.speed = 1
         self.dir = 1
+        self.timer_anime = 0
+        self.frame = 0
+
+    def move(self, FPS, enemy_images, stopEnemy_group):
+        self.animation(FPS, enemy_images)
+        self.rect.x += self.speed * self.dir
+        if pygame.sprite.spritecollide(self, stopEnemy_group, False):
+            self.rect.x -= self.speed * self.dir
+            self.dir *= -1
+        if self.dir == 1:
+            self.image = enemy_images[self.frame]
+        else:
+            self.image = pygame.transform.flip(enemy_images[self.frame], True, False)
+
+    def animation(self, FPS, enemy_images):
+        self.timer_anime += 1
+        if self.timer_anime / FPS > 0.05:
+            if self.frame == len(enemy_images) - 1:
+                self.frame = 0
+            else:
+                self.frame += 1
+            self.timer_anime = 0
+
+
 
     def update(self, step, player_group, player, stopEnemy_group):
         self.rect.x += step
-        if self.dir == 1:
-            self.image = pygame.transform.flip(self.image, False, False)
-            self.rect.x += self.speed
-        elif self.dir == -1:
-            self.image = pygame.transform.flip(self.image, True, False)
-            self.rect.x -= self.speed
-        if pygame.sprite.spritecollide(self, stopEnemy_group, False):
-            self.dir = -self.dir
+        # if self.dir == 1:
+        #     self.image = pygame.transform.flip(self.image, False, False)
+        #     self.rect.x += self.speed
+        # elif self.dir == -1:
+        #     self.image = pygame.transform.flip(self.image, True, False)
+        #     self.rect.x -= self.speed
 
 
 

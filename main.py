@@ -1,6 +1,9 @@
 import pygame
 import sys
 import random
+
+import pygwidgets
+
 from sprites.spriteclasses import *
 
 GREY = (210, 210, 210)
@@ -17,7 +20,8 @@ from load import *
 
 def restart():
     global box_group, ground_group, player_group, scroll_group,\
-        sand_group, water_group, player, enemy_group, coin_group, stopenemy_group, portal_group
+        sand_group, water_group, player, enemy_group, coin_group, stopenemy_group, portal_group, \
+        hp, hp_text
     box_group = pygame.sprite.Group()
     ground_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
@@ -32,9 +36,14 @@ def restart():
     player = Player(player_image,(480, 560))
     player_group.add(player)
 
+    hp = 100
+    hp_text = pygwidgets.DisplayText(window,(200,20), 'HP: 100',
+                                     fontSize=40, textColor=(0,0,0))
+
 def lvlGame():
     global box_group, ground_group, step, player_group, sand_group,\
-        water_group, player, enemy_group, coin_group, stopenemy_group, portal_group, stopEnemy_group
+        water_group, player, enemy_group, coin_group, stopenemy_group, portal_group,\
+        hp, hp_text
     step = 0
     box_group.draw(window)
     ground_group.draw(window)
@@ -50,14 +59,31 @@ def lvlGame():
     water_group.update(step, player_group, player, stopenemy_group)
     sand_group.update(step, player_group, player, stopenemy_group)
     player_group.update(player_images, scroll_group,  player_group, player, stopenemy_group, FPS)
-    enemy_group.update(step, player_group, player, stopenemy_group)
+    enemy_group.update(step, player_group, player, stopenemy_group, )
     coin_group.update(step, player_group, player, stopenemy_group)
     stopenemy_group.update(step, player_group, player, stopenemy_group)
-    portal_group.update(step, player_group, player, stopenemy_group)
+    # portal_group.update(step, player_group, player, stopenemy_group)
+    for enemy in enemy_group:
+        enemy.move(FPS, enemy1_image, stopenemy_group)
     if player.rect.y > 850:
         player.kill()
         restart()
         drawMap('game_lvl/lvl1.csv')
+    hit_enemies = pygame.sprite.spritecollide(player, enemy_group, False)
+    for enemy in hit_enemies:
+        if player.velocity_y > 0 and \
+            player.rect.bottom - enemy.rect.top < 20:
+            enemy.kill()
+        else:
+            if not player.invulnerable:
+                hp -= 10
+                player.invulnerable = True
+                hp_text.setValue(f'HP:{hp}')
+        if hp <= 0:
+            player.kill()
+            restart()
+            drawMap('game_lvl/lvl1.csv')
+            return
 
 
 
@@ -100,7 +126,7 @@ def drawMap(mapFile):
                 stopenemy_group.add(stopenemy)
                 scroll_group.add(stopenemy)
             elif game_map[i][j] == '6':
-                enemy1 = Enemy(enemy1_image, pos)
+                enemy1 = Enemy(enemy1_image[0], pos)
                 enemy_group.add(enemy1)
                 scroll_group.add(enemy1)
             elif game_map[i][j] == '7':
@@ -117,7 +143,7 @@ def drawMap(mapFile):
                 scroll_group.add(enemy4)
             elif game_map[i][j] == '10':
                 portal1 = Portal(portal1_image, pos)
-                enemy_group.add(portal1)
+                portal_group.add(portal1)
                 scroll_group.add(portal1)
 
 

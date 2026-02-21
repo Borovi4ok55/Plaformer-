@@ -32,6 +32,8 @@ coin_image = pygame.image.load('assets/images/item/coin.png').convert_alpha()
 
 enemy4_image = pygame.image.load('assets/images/enemy/4/1.png').convert_alpha()
 
+hpbott_image = pygame.image.load('assets/images/hp.png').convert_alpha()
+
 
 
 

@@ -256,3 +256,18 @@ class StopEnemy(pygame.sprite.Sprite):
     def update(self, step, player_group, player, stopEnemy_group):
         self.rect.x += step
 
+
+
+
+class HpBott(pygame.sprite.Sprite):
+    def __init__(self, image, pos):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.x = pos[0]
+        self.rect.y = pos[1]
+
+    def update(self, step, player_group, player, stopEnemy_group):
+        self.rect.x += step
+
+

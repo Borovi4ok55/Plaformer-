@@ -10,18 +10,25 @@ GREY = (210, 210, 210)
 WIDTH = 1200
 HEIGHT = 800
 FPS = 60
+HP_BAR_WIDTH = 300
+HP_BAR_HEIGHT = 30
+HP_BAR_X = 200
+HP_BAR_Y = 20
+
 
 pygame.init()
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Platformer')
 clock = pygame.time.Clock()
 
+
+
 from load import *
 
 def restart():
     global box_group, ground_group, player_group, scroll_group,\
         sand_group, water_group, player, enemy_group, coin_group, stopenemy_group, portal_group, \
-        hp, hp_text
+        hp, hp_text, color, hpbott_group
     box_group = pygame.sprite.Group()
     ground_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
@@ -32,18 +39,22 @@ def restart():
     coin_group = pygame.sprite.Group()
     stopenemy_group = pygame.sprite.Group()
     portal_group = pygame.sprite.Group()
+    hpbott_group = pygame.sprite.Group()
 
     player = Player(player_image,(480, 560))
     player_group.add(player)
 
+    color = (0,200,0)
     hp = 100
     hp_text = pygwidgets.DisplayText(window,(200,20), 'HP: 100',
                                      fontSize=40, textColor=(0,0,0))
 
+
+
 def lvlGame():
     global box_group, ground_group, step, player_group, sand_group,\
         water_group, player, enemy_group, coin_group, stopenemy_group, portal_group,\
-        hp, hp_text
+        hp, hp_text, color, hpbott_group
     step = 0
     box_group.draw(window)
     ground_group.draw(window)
@@ -52,8 +63,17 @@ def lvlGame():
     player_group.draw(window)
     enemy_group.draw(window)
     coin_group.draw(window)
-    stopenemy_group.draw(window)
     portal_group.draw(window)
+    hpbott_group.draw(window)
+
+    pygame.draw.rect(window, (150, 150, 150),
+                     (HP_BAR_X, HP_BAR_Y, HP_BAR_WIDTH, HP_BAR_HEIGHT))
+    current_width = (hp / 100) * HP_BAR_WIDTH
+    pygame.draw.rect(window, color,
+                     (HP_BAR_X, HP_BAR_Y, current_width, HP_BAR_HEIGHT))
+    pygame.draw.rect(window, (0, 0, 0),
+                     (HP_BAR_X, HP_BAR_Y, HP_BAR_WIDTH, HP_BAR_HEIGHT), 2)
+    hp_text.draw()
     box_group.update(step, player_group, player, stopenemy_group)
     ground_group.update(step, player_group, player, stopenemy_group)
     water_group.update(step, player_group, player, stopenemy_group)
@@ -63,6 +83,7 @@ def lvlGame():
     coin_group.update(step, player_group, player, stopenemy_group)
     stopenemy_group.update(step, player_group, player, stopenemy_group)
     # portal_group.update(step, player_group, player, stopenemy_group)
+    hpbott_group.update(step, player_group, player, stopenemy_group)
     for enemy in enemy_group:
         enemy.move(FPS, enemy1_image, stopenemy_group)
     if player.rect.y > 850:
@@ -84,6 +105,23 @@ def lvlGame():
             restart()
             drawMap('game_lvl/lvl1.csv')
             return
+
+
+
+    if pygame.sprite.spritecollide(player, hpbott_group, True):
+        hp += 30
+        if hp > 100:
+            hp = 100
+        hp_text.setValue(f'HP:{hp}')
+
+    if hp > 60:
+        color = (0, 200, 0)
+    elif hp > 30:
+        color = (255, 165, 0)
+    elif hp <= 30:
+        color = (200, 0, 0)
+
+
 
 
 
@@ -145,10 +183,15 @@ def drawMap(mapFile):
                 portal1 = Portal(portal1_image, pos)
                 portal_group.add(portal1)
                 scroll_group.add(portal1)
+            elif game_map[i][j] == '11':
+                hpbott = HpBott(hpbott_image, pos)
+                hpbott_group.add(hpbott)
+                scroll_group.add(hpbott)
 
 
 restart()
 drawMap('game_lvl/lvl1.csv')
+
 
 
 while True:

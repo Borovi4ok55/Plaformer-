@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.2" name="platformer_set" tilewidth="100" tileheight="100" tilecount="11" columns="0">
+<tileset version="1.10" tiledversion="1.11.2" name="platformer_set" tilewidth="100" tileheight="100" tilecount="12" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="0">
   <image source="../assets/images/blocks/ground.png" width="80" height="80"/>
@@ -33,5 +33,8 @@
  </tile>
  <tile id="10">
   <image source="../assets/images/portal/portal1.png" width="100" height="100"/>
+ </tile>
+ <tile id="11">
+  <image source="../assets/images/hp.png" width="30" height="50"/>
  </tile>
 </tileset>

@@ -34,6 +34,10 @@ enemy4_image = pygame.image.load('assets/images/enemy/4/1.png').convert_alpha()
 
 hpbott_image = pygame.image.load('assets/images/hp.png').convert_alpha()
 
+nps_image = pygame.image.load('assets/images/npc/1.png').convert_alpha()
+
+nps_images = load_image('assets/images/npc')
+
 
 
 

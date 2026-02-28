@@ -9,7 +9,7 @@ class Ground(pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def update(self, step, player_group, player, stopEnemy_group):
+    def update(self, step, player_group, player, stopEnemy_group, FPS, nps_images):
         self.rect.x += step
         if pygame.sprite.spritecollide(self, player_group, False):
             if abs(self.rect.top - player.rect.bottom) < 15:
@@ -32,7 +32,7 @@ class Sand(pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def update(self, step, player_group, player, stopEnemy_group):
+    def update(self, step, player_group, player, stopEnemy_group, FPS, nps_images):
         self.rect.x += step
         if pygame.sprite.spritecollide(self, player_group, False):
             if abs(self.rect.top - player.rect.bottom) < 15:
@@ -57,7 +57,7 @@ class Water(pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def update(self, step, player_group, player, stopEnemy_group):
+    def update(self, step, player_group, player, stopEnemy_group, FPS, nps_images):
         self.rect.x += step
         # if pygame.sprite.spritecollide(self, player_group, False):
         #     if abs(self.rect.top - player.rect.bottom) < 15:
@@ -82,7 +82,7 @@ class Box(pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def update(self, step, player_group, player, stopEnemy_group):
+    def update(self, step, player_group, player, stopEnemy_group, FPS, nps_images):
         self.rect.x += step
         if pygame.sprite.spritecollide(self, player_group, False):
             if abs(self.rect.top - player.rect.bottom) < 15:
@@ -128,7 +128,7 @@ class Player(pygame.sprite.Sprite):
                     self.frame += 1
                 self.timer_anime = 0
 
-    def move(self, player_images, scroll_group,  player_group, player, stopEnemy_group, FPS, key):
+    def move(self, player_images, scroll_group,  player_group, player, stopEnemy_group, FPS, key,  nps_images):
         if key[pygame.K_RIGHT]:
             self.anime = True
             # self.image = pygame.transform.flip(player_image, False, False)
@@ -136,7 +136,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.x += self.speed
             if self.rect.right > 800:
                 self.rect.right = 800
-                scroll_group.update(-self.speed, player_group, player, stopEnemy_group)
+                scroll_group.update(-self.speed, player_group, player, stopEnemy_group, FPS, nps_images)
         elif key[pygame.K_LEFT]:
             self.anime = True
             self.image = pygame.transform.flip(player_images[self.frame], True, False)
@@ -144,7 +144,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.x -= self.speed
             if self.rect.left < 200:
                 self.rect.left = 200
-                scroll_group.update(self.speed,  player_group, player, stopEnemy_group)
+                scroll_group.update(self.speed,  player_group, player, stopEnemy_group, FPS, nps_images)
         else:
             self.anime = False
 
@@ -157,10 +157,10 @@ class Player(pygame.sprite.Sprite):
         if self.velocity_y > 10:
             self.velocity_y = 10
 
-    def update(self, player_images, scroll_group,  player_group, player, stopEnemy_group, FPS):
+    def update(self, player_images, scroll_group,  player_group, player, stopEnemy_group, FPS, nps_images):
         self.animation(player_images, FPS)
         key = pygame.key.get_pressed()
-        self.move(player_images, scroll_group,  player_group, player, stopEnemy_group, FPS, key)
+        self.move(player_images, scroll_group,  player_group, player, stopEnemy_group, FPS, key,  nps_images)
         self.jump(key)
         self.hit()
 
@@ -182,7 +182,7 @@ class Portal(pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def update(self, step, player_group, player, stopeEnemy_group):
+    def update(self, step, player_group, player, stopeEnemy_group, FPS, nps_images):
         self.rect.x += step
 
 
@@ -194,7 +194,7 @@ class Coin(pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def update(self, step, player_group, player, stopEnemy_group):
+    def update(self, step, player_group, player, stopEnemy_group, FPS, nps_images):
         self.rect.x += step
 
 
@@ -232,7 +232,7 @@ class Enemy(pygame.sprite.Sprite):
 
 
 
-    def update(self, step, player_group, player, stopEnemy_group):
+    def update(self, step, player_group, player, stopEnemy_group, FPS, nps_images):
         self.rect.x += step
         # if self.dir == 1:
         #     self.image = pygame.transform.flip(self.image, False, False)
@@ -253,7 +253,7 @@ class StopEnemy(pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def update(self, step, player_group, player, stopEnemy_group):
+    def update(self, step, player_group, player, stopEnemy_group, FPS, nps_images):
         self.rect.x += step
 
 
@@ -267,7 +267,33 @@ class HpBott(pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def update(self, step, player_group, player, stopEnemy_group):
+    def update(self, step, player_group, player, stopEnemy_group, FPS, nps_images):
         self.rect.x += step
 
+
+
+
+class NPS(pygame.sprite.Sprite):
+    def __init__(self, image, pos):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.x = pos[0]
+        self.rect.y = pos[1]
+        self.timer_anime = 0
+        self.frame = 0
+
+    def update(self, step, player_group, player, stopEnemy_group, FPS, nps_images):
+        self.rect.x += step
+        self.animation(FPS, nps_images)
+
+    def animation(self, FPS, nps_images):
+        self.timer_anime += 1
+        if self.timer_anime / FPS > 0.05:
+            if self.frame == len(nps_images) - 1:
+                self.frame = 0
+            else:
+                self.frame += 1
+            self.timer_anime = 0
+        self.image = nps_images[self.frame]
 

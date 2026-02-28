@@ -1,9 +1,7 @@
 import pygame
 import sys
 import random
-
-import pygwidgets
-
+from pygwidgets import *
 from sprites.spriteclasses import *
 
 GREY = (210, 210, 210)
@@ -28,7 +26,7 @@ from load import *
 def restart():
     global box_group, ground_group, player_group, scroll_group,\
         sand_group, water_group, player, enemy_group, coin_group, stopenemy_group, portal_group, \
-        hp, hp_text, color, hpbott_group
+        hp, hp_text, color, hpbott_group, nps_group, quest_text, quest_visible, coins, coin_text
     box_group = pygame.sprite.Group()
     ground_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
@@ -40,6 +38,7 @@ def restart():
     stopenemy_group = pygame.sprite.Group()
     portal_group = pygame.sprite.Group()
     hpbott_group = pygame.sprite.Group()
+    nps_group = pygame.sprite.Group()
 
     player = Player(player_image,(480, 560))
     player_group.add(player)
@@ -49,12 +48,20 @@ def restart():
     hp_text = pygwidgets.DisplayText(window,(200,20), 'HP: 100',
                                      fontSize=40, textColor=(0,0,0))
 
+    quest_text = DisplayText(window, (0,0), 'Collect 4 coins', 'Helvetica', fontSize=20,
+                             textColor = (0,0,0), backgroundColor = (255,255,255))
+
+    quest_visible = False
+
+    coins = 0
+    coin_text = pygwidgets.DisplayText(window, (50, 20), 'Coins:0',
+                                     fontSize=40, textColor=(0, 0, 0))
 
 
 def lvlGame():
     global box_group, ground_group, step, player_group, sand_group,\
         water_group, player, enemy_group, coin_group, stopenemy_group, portal_group,\
-        hp, hp_text, color, hpbott_group
+        hp, hp_text, color, hpbott_group, nps_group,  quest_visible, coins
     step = 0
     box_group.draw(window)
     ground_group.draw(window)
@@ -65,6 +72,7 @@ def lvlGame():
     coin_group.draw(window)
     portal_group.draw(window)
     hpbott_group.draw(window)
+    nps_group.draw(window)
 
     pygame.draw.rect(window, (150, 150, 150),
                      (HP_BAR_X, HP_BAR_Y, HP_BAR_WIDTH, HP_BAR_HEIGHT))
@@ -74,16 +82,18 @@ def lvlGame():
     pygame.draw.rect(window, (0, 0, 0),
                      (HP_BAR_X, HP_BAR_Y, HP_BAR_WIDTH, HP_BAR_HEIGHT), 2)
     hp_text.draw()
-    box_group.update(step, player_group, player, stopenemy_group)
-    ground_group.update(step, player_group, player, stopenemy_group)
-    water_group.update(step, player_group, player, stopenemy_group)
-    sand_group.update(step, player_group, player, stopenemy_group)
-    player_group.update(player_images, scroll_group,  player_group, player, stopenemy_group, FPS)
-    enemy_group.update(step, player_group, player, stopenemy_group, )
-    coin_group.update(step, player_group, player, stopenemy_group)
-    stopenemy_group.update(step, player_group, player, stopenemy_group)
+    coin_text.draw()
+    box_group.update(step, player_group, player, stopenemy_group, FPS, nps_images)
+    ground_group.update(step, player_group, player, stopenemy_group, FPS, nps_images)
+    water_group.update(step, player_group, player, stopenemy_group, FPS, nps_images)
+    sand_group.update(step, player_group, player, stopenemy_group, FPS, nps_images)
+    player_group.update(player_images, scroll_group,  player_group, player, stopenemy_group, FPS, nps_images)
+    enemy_group.update(step, player_group, player, stopenemy_group, FPS, nps_images)
+    coin_group.update(step, player_group, player, stopenemy_group, FPS, nps_images)
+    stopenemy_group.update(step, player_group, player, stopenemy_group, FPS, nps_images)
     # portal_group.update(step, player_group, player, stopenemy_group)
-    hpbott_group.update(step, player_group, player, stopenemy_group)
+    hpbott_group.update(step, player_group, player, stopenemy_group, FPS, nps_images)
+    nps_group.update(step, player_group, player, stopenemy_group, FPS, nps_images)
     for enemy in enemy_group:
         enemy.move(FPS, enemy1_image, stopenemy_group)
     if player.rect.y > 850:
@@ -121,6 +131,21 @@ def lvlGame():
     elif hp <= 30:
         color = (200, 0, 0)
 
+    quest_visible = False
+
+    for nps in nps_group:
+        distance = abs(player.rect.centerx - nps.rect.centerx)
+        if distance < 100:
+            quest_visible = True
+            quest_text.setLoc((nps.rect.centerx-80, nps.rect.top-40))
+
+    if quest_visible:
+        quest_text.draw()
+
+    if pygame.sprite.spritecollide(player, coin_group, True):
+        coins += 1
+        coin_text.setValue(f'Coins:{coins}')
+
 
 
 
@@ -129,7 +154,7 @@ def lvlGame():
 
 def drawMap(mapFile):
     global box_group, ground_group, step, player_group, sand_group, \
-        water_group, player, enemy_group, coin_group, stopenemy_group, portal_group
+        water_group, player, enemy_group, coin_group, stopenemy_group, portal_group, nps_group
     game_map = []
     with open(mapFile, 'r') as file:
         for i in range(10):
@@ -187,6 +212,11 @@ def drawMap(mapFile):
                 hpbott = HpBott(hpbott_image, pos)
                 hpbott_group.add(hpbott)
                 scroll_group.add(hpbott)
+            elif game_map[i][j] == '12':
+                nps = NPS(nps_image, pos)
+                nps_group.add(nps)
+                scroll_group.add(nps)
+
 
 
 restart()
